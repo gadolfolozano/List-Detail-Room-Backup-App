@@ -14,9 +14,13 @@ import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 import pe.gadolfolozano.listdetailroombackupapp.R
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(),
     InputTextBottomSheetFragment.InputTextListener {
+
+    private val mainViewModel: MainViewModel by viewModel()
+
     private lateinit var navController: NavController
     private lateinit var drawerLayout: DrawerLayout
 
@@ -27,7 +31,8 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        navController = Navigation.findNavController(this,
+        navController = Navigation.findNavController(
+            this,
             R.id.nav_host_fragment
         )
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -49,6 +54,8 @@ class MainActivity : AppCompatActivity(),
                 )
             fragment.show(supportFragmentManager, "inputTextFragment")
         }
+
+        mainViewModel.getUser()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,7 +83,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onTextSaved(inputType: Int, text: String) {
-        when(inputType) {
+        when (inputType) {
             InputTextBottomSheetFragment.InputType.USERNAME.value -> {
                 Log.d("MainActivity", "USERNAME should save text: $text")
             }
