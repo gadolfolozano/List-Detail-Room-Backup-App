@@ -11,10 +11,11 @@ import pe.gadolfolozano.listdetailroombackupapp.data.TaskDatabase
 import pe.gadolfolozano.listdetailroombackupapp.ui.MainViewModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskList.TaskListViewModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail.TaskDetailViewModel
+import pe.gadolfolozano.listdetailroombackupapp.ui.util.UUIDGenerator
 
 object Koin {
     @JvmField
-    val MODULES: List<Module> = listOf(taskModule, databaseModule)
+    val MODULES: List<Module> = listOf(taskModule, databaseModule, utilModule)
 
     @JvmStatic
     fun initialize(application: Application) {
@@ -26,9 +27,9 @@ object Koin {
 }
 
 val taskModule = module {
-    viewModel { TaskListViewModel() }
+    viewModel { TaskListViewModel(get()) }
     viewModel { TaskDetailViewModel() }
-    viewModel { MainViewModel(get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
 }
 
 val databaseModule = module {
@@ -45,4 +46,8 @@ val databaseModule = module {
     single { get<TaskDatabase>().taskDAO() }
 
     single { get<TaskDatabase>().taskDetailDAO() }
+}
+
+val utilModule = module {
+    single { UUIDGenerator() }
 }

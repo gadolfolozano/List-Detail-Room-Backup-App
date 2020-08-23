@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pe.gadolfolozano.listdetailroombackupapp.R
-import pe.gadolfolozano.listdetailroombackupapp.ui.model.TaskModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
 
 class TaskListFragment : Fragment() {
@@ -62,20 +61,6 @@ class TaskListFragment : Fragment() {
             recyclerView.visibility = if (tasks.isEmpty()) View.GONE else View.VISIBLE
         }
 
-        val tasks = listOf(
-            TaskModel(
-                "uuid",
-                "Task one"
-            ),
-            TaskModel(
-                "uuid",
-                "Task two"
-            ),
-            TaskModel(
-                "uuid",
-                "Task three"
-            )
-        )
-        taskViewModel.updateTasks(tasks)
+        taskViewModel.fetchTasks()
     }
 }

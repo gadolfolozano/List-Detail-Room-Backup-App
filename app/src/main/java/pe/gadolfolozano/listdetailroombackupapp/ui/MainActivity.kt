@@ -12,9 +12,9 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import pe.gadolfolozano.listdetailroombackupapp.R
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(),
     InputTextBottomSheetFragment.InputTextListener {
@@ -85,10 +85,10 @@ class MainActivity : AppCompatActivity(),
     override fun onTextSaved(inputType: Int, text: String) {
         when (inputType) {
             InputTextBottomSheetFragment.InputType.USERNAME.value -> {
-                Log.d("MainActivity", "USERNAME should save text: $text")
+                mainViewModel.saveUser(text)
             }
             InputTextBottomSheetFragment.InputType.TASK_NAME.value -> {
-                Log.d("MainActivity", "TASK_NAME should save text: $text")
+                mainViewModel.saveTask(text)
             }
             InputTextBottomSheetFragment.InputType.TASK_DETAIL.value -> {
                 Log.d("MainActivity", "TASK_DETAIL should save text: $text")
