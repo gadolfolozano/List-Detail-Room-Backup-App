@@ -20,7 +20,10 @@
         android:name="pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail.TaskDetailFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_task_detail">
-
+        <argument
+            android:name="taskId"
+            app:argType="string"
+            android:defaultValue="" />
         <action
             android:id="@+id/action_TaskDetailFragment_to_FirstFragment"
             app:destination="@id/TaskListFragment" />

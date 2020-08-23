@@ -1,19 +1,22 @@
 package pe.gadolfolozano.listdetailroombackupapp.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pe.gadolfolozano.listdetailroombackupapp.R
+import pe.gadolfolozano.listdetailroombackupapp.ui.taskList.TaskListFragment
+import pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail.TaskDetailFragment
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
 
 class MainActivity : AppCompatActivity(),
@@ -55,7 +58,10 @@ class MainActivity : AppCompatActivity(),
             fragment.show(supportFragmentManager, "inputTextFragment")
         }
 
-        mainViewModel.getUser()
+        mainViewModel.fetchUser()
+        mainViewModel.userLiveData.observe(this) { userModel ->
+            userNameTextView.text = userModel.userName
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -83,16 +89,24 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onTextSaved(inputType: Int, text: String) {
+        val currentFragment = getCurrentFragment()
+
         when (inputType) {
             InputTextBottomSheetFragment.InputType.USERNAME.value -> {
                 mainViewModel.saveUser(text)
             }
             InputTextBottomSheetFragment.InputType.TASK_NAME.value -> {
-                mainViewModel.saveTask(text)
+                (currentFragment as? TaskListFragment)?.saveTask(text)
             }
             InputTextBottomSheetFragment.InputType.TASK_DETAIL.value -> {
-                Log.d("MainActivity", "TASK_DETAIL should save text: $text")
+                (currentFragment as? TaskDetailFragment)?.saveTaskDetail(text)
             }
         }
     }
+
+    private fun getCurrentFragment(): Fragment? {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        return navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
+    }
+
 }

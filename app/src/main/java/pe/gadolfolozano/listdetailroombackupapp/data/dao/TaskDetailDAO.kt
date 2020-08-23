@@ -1,5 +1,6 @@
 package pe.gadolfolozano.listdetailroombackupapp.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,6 +11,9 @@ import pe.gadolfolozano.listdetailroombackupapp.data.entity.TaskDetailEntity
 interface TaskDetailDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(entity: TaskDetailEntity)
+
+    @Query("SELECT * FROM task_detail WHERE taskId = :taskId")
+    fun fetchByTask(taskId: String): LiveData<List<TaskDetailEntity>>
 
     @Query("SELECT * FROM task_detail")
     suspend fun listAll(): List<TaskDetailEntity>

@@ -7,19 +7,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pe.gadolfolozano.listdetailroombackupapp.R
-import pe.gadolfolozano.listdetailroombackupapp.ui.model.TaskDetailModel
-import pe.gadolfolozano.listdetailroombackupapp.ui.model.TaskModel
-import pe.gadolfolozano.listdetailroombackupapp.ui.taskList.TaskListViewModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
 
 class TaskDetailFragment : Fragment() {
 
     private val taskDetailViewModel: TaskDetailViewModel by viewModel()
+    private val args: TaskDetailFragmentArgs by navArgs()
 
     lateinit var adapter: TaskDetailAdapter
     lateinit var recyclerView: RecyclerView
@@ -63,20 +62,10 @@ class TaskDetailFragment : Fragment() {
             recyclerView.visibility = if (taskDetails.isEmpty()) View.GONE else View.VISIBLE
         }
 
-        val tasksDetails = listOf(
-            TaskDetailModel(
-                "uuid",
-                "Task one"
-            ),
-            TaskDetailModel(
-                "uuid",
-                "Task two"
-            ),
-            TaskDetailModel(
-                "uuid",
-                "Task three"
-            )
-        )
-        taskDetailViewModel.updateTaskDetails(tasksDetails)
+        taskDetailViewModel.fetchTasks(args.taskId)
+    }
+
+    fun saveTaskDetail(taskDetail: String) {
+        taskDetailViewModel.saveTaskDetail(args.taskId, taskDetail)
     }
 }

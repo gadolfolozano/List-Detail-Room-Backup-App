@@ -27,9 +27,9 @@ object Koin {
 }
 
 val taskModule = module {
-    viewModel { TaskListViewModel(get()) }
-    viewModel { TaskDetailViewModel() }
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { TaskListViewModel(get(), get()) }
+    viewModel { TaskDetailViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get()) }
 }
 
 val databaseModule = module {

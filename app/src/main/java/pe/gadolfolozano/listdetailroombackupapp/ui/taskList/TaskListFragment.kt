@@ -42,8 +42,10 @@ class TaskListFragment : Fragment() {
         adapter = TaskAdapter()
         recyclerView.adapter = adapter
         recyclerView.layoutManager = GridLayoutManager(context, 2)
-        adapter.setItemClickListener { _, _ ->
-            findNavController().navigate(R.id.action_TaskListFragment_to_TaskDetailFragment)
+        adapter.setItemClickListener { task, _ ->
+            val action =
+                TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment(task.uuid)
+            findNavController().navigate(action)
         }
 
         fabAdd.setOnClickListener {
@@ -62,5 +64,9 @@ class TaskListFragment : Fragment() {
         }
 
         taskViewModel.fetchTasks()
+    }
+
+    fun saveTask(taskName: String){
+        taskViewModel.saveTask(taskName)
     }
 }

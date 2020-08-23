@@ -2,10 +2,15 @@ package pe.gadolfolozano.listdetailroombackupapp.ui.taskList
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import pe.gadolfolozano.listdetailroombackupapp.data.dao.TaskDAO
+import pe.gadolfolozano.listdetailroombackupapp.data.entity.TaskEntity
 import pe.gadolfolozano.listdetailroombackupapp.ui.model.TaskModel
+import pe.gadolfolozano.listdetailroombackupapp.ui.util.UUIDGenerator
 
-class TaskListViewModel(private val taskDAO: TaskDAO) : ViewModel() {
+class TaskListViewModel(private val taskDAO: TaskDAO, private val uuidGenerator: UUIDGenerator) :
+    ViewModel() {
 
     val taskListLiveData = MediatorLiveData<List<TaskModel>>()
 
@@ -17,6 +22,13 @@ class TaskListViewModel(private val taskDAO: TaskDAO) : ViewModel() {
                     name = it.name
                 )
             })
+        }
+    }
+
+    fun saveTask(taskName: String) {
+        viewModelScope.launch {
+            val task = TaskEntity(uuid = uuidGenerator.generate(), name = taskName)
+            taskDAO.save(task)
         }
     }
 }
