@@ -8,6 +8,10 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import pe.gadolfolozano.listdetailroombackupapp.data.TaskDatabase
+import pe.gadolfolozano.listdetailroombackupapp.domain.BackupUtil
+import pe.gadolfolozano.listdetailroombackupapp.domain.ClearDataBaseUseCase
+import pe.gadolfolozano.listdetailroombackupapp.domain.CreateBackupUseCase
+import pe.gadolfolozano.listdetailroombackupapp.domain.RestoreBackupUseCase
 import pe.gadolfolozano.listdetailroombackupapp.ui.MainViewModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskList.TaskListViewModel
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail.TaskDetailViewModel
@@ -27,9 +31,14 @@ object Koin {
 }
 
 val taskModule = module {
+    factory { BackupUtil() }
+    factory { CreateBackupUseCase(get()) }
+    factory { RestoreBackupUseCase(get()) }
+    factory { ClearDataBaseUseCase(get()) }
+
     viewModel { TaskListViewModel(get(), get()) }
     viewModel { TaskDetailViewModel(get(), get()) }
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get()) }
 }
 
 val databaseModule = module {

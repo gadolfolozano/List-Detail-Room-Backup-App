@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(),
         return when (item.itemId) {
             R.id.action_create_backup -> {
                 if(checkStoragePermission()){
-                    //Do something
+                    mainViewModel.createBackup()
                 }
                 true
             }
