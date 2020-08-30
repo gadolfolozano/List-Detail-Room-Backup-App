@@ -3,6 +3,7 @@ package pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pe.gadolfolozano.listdetailroombackupapp.data.dao.TaskDetailDAO
 import pe.gadolfolozano.listdetailroombackupapp.data.entity.TaskDetailEntity
@@ -25,7 +26,7 @@ class TaskDetailViewModel(
     }
 
     fun saveTaskDetail(taskId: String, detail: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val taskDetail =
                 TaskDetailEntity(uuid = uuidGenerator.generate(), taskId = taskId, detail = detail)
             taskDetailDAO.save(taskDetail)

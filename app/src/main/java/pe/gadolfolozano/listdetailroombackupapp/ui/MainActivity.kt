@@ -1,10 +1,14 @@
 package pe.gadolfolozano.listdetailroombackupapp.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -71,7 +75,22 @@ class MainActivity : AppCompatActivity(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_create_backup -> {
+                if(checkStoragePermission()){
+                    //Do something
+                }
+                true
+            }
+            R.id.action_restore_backup -> {
+                if(checkStoragePermission()){
+                    //Do something
+                }
+                true
+            }
+            R.id.action_clean_data_base -> {
+                //permission not needed
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -107,6 +126,29 @@ class MainActivity : AppCompatActivity(),
     private fun getCurrentFragment(): Fragment? {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
         return navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
+    }
+
+    private fun hasStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun checkStoragePermission(): Boolean {
+        if (!hasStoragePermission()) {
+            requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_STORAGE_PERMISSION_CODE
+            )
+            return false
+        }
+        return true
+    }
+
+    companion object {
+        const val REQUEST_STORAGE_PERMISSION_CODE = 100
     }
 
 }

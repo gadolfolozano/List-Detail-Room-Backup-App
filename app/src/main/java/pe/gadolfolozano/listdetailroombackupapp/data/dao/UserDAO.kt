@@ -15,6 +15,9 @@ interface UserDAO {
     @Query("SELECT * FROM user")
     fun fetchUser(): LiveData<List<UserEntity>>
 
+    @Query("SELECT * FROM user LIMIT 1")
+    fun getLoggedUser(): UserEntity?
+
     @Query("SELECT * FROM user")
     suspend fun listAll(): List<UserEntity>
 

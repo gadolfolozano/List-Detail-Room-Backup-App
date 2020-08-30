@@ -3,8 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pe.gadolfolozano.listdetailroombackupapp.ui.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_create_backup"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_create_backup"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_restore_backup"
+        android:orderInCategory="100"
+        android:title="@string/action_restore_backup"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clean_data_base"
+        android:orderInCategory="100"
+        android:title="@string/action_clean_data_base"
         app:showAsAction="never" />
 </menu>
