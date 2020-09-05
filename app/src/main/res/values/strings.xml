@@ -10,10 +10,12 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
+    <string name="text_set_user_name">(click to set a username)</string>
 
     <string name="action_create_backup">Create Backup</string>
     <string name="action_restore_backup">Restore Backup</string>
     <string name="action_clean_data_base">Clean database</string>
 
     <string name="text_backup_created">Backup created at %s</string>
+    <string name="text_database_cleaned">Database cleaned</string>
 </resources>

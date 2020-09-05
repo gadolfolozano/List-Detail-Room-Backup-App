@@ -23,15 +23,15 @@ class MainViewModel(
     private val uuidGenerator: UUIDGenerator
 ) : ViewModel() {
 
-    val userLiveData = MediatorLiveData<UserModel>()
+    val userLiveData = MediatorLiveData<UserModel?>()
 
     val createBackupFileResult = SingleLiveEvent<File>()
 
+    val cleanDataBaseResult = SingleLiveEvent<Boolean>()
+
     fun fetchUser() {
         userLiveData.addSource(userDAO.fetchUser()) { userEntityList ->
-            userEntityList.firstOrNull()?.let { user ->
-                userLiveData.postValue(UserModel(user.username))
-            }
+            userLiveData.postValue(userEntityList?.map { UserModel(it.username) }?.firstOrNull())
         }
     }
 
@@ -63,6 +63,7 @@ class MainViewModel(
     fun clearDataBase() {
         viewModelScope.launch(Dispatchers.IO) {
             clearDataBaseUseCase.execute()
+            cleanDataBaseResult.postValue(true)
         }
     }
 }

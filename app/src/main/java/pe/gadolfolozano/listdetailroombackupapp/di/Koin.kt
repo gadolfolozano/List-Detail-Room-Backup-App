@@ -32,7 +32,7 @@ object Koin {
 }
 
 val taskModule = module {
-    factory { BackupUtil(androidContext(), get(), get(), get(), get()) }
+    factory { BackupUtil(androidContext(), get(), get(), get(), get(), get()) }
     factory { CreateBackupUseCase(get()) }
     factory { RestoreBackupUseCase(get()) }
     factory { ClearDataBaseUseCase(get()) }

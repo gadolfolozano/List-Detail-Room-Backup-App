@@ -3,10 +3,7 @@ package pe.gadolfolozano.listdetailroombackupapp.domain
 import android.content.Context
 import android.os.Environment
 import pe.gadolfolozano.listdetailroombackupapp.data.BackupTaskDatabase
-import pe.gadolfolozano.listdetailroombackupapp.data.dao.BackupTaskDAO
-import pe.gadolfolozano.listdetailroombackupapp.data.dao.BackupTaskDetailDAO
-import pe.gadolfolozano.listdetailroombackupapp.data.dao.TaskDAO
-import pe.gadolfolozano.listdetailroombackupapp.data.dao.TaskDetailDAO
+import pe.gadolfolozano.listdetailroombackupapp.data.dao.*
 import pe.gadolfolozano.listdetailroombackupapp.data.entity.mapToBackup
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.zip
 import java.io.File
@@ -15,6 +12,7 @@ import java.util.*
 
 class BackupUtil(
     private val context: Context,
+    private val userDAO: UserDAO,
     private val taskDAO: TaskDAO,
     private val taskDetailDAO: TaskDetailDAO,
     private val backupTaskDAO: BackupTaskDAO,
@@ -33,8 +31,9 @@ class BackupUtil(
     }
 
     suspend fun cleanDataBase() {
-        taskDAO.deleteAll()
         taskDetailDAO.deleteAll()
+        taskDAO.deleteAll()
+        userDAO.deleteAll()
     }
 
     private suspend fun cleanBackupDataBase() {

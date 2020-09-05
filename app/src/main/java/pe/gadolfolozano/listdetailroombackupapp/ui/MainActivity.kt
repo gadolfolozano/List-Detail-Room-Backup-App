@@ -17,6 +17,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pe.gadolfolozano.listdetailroombackupapp.R
@@ -65,12 +66,19 @@ class MainActivity : AppCompatActivity(),
 
         mainViewModel.fetchUser()
         mainViewModel.userLiveData.observe(this) { userModel ->
-            userNameTextView.text = userModel.userName
+            userNameTextView.text = userModel?.userName ?: getString(R.string.text_set_user_name)
         }
         mainViewModel.createBackupFileResult.observe(this) { backupFile ->
             Toast.makeText(
                 this,
                 getString(R.string.text_backup_created, backupFile.absolutePath),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        mainViewModel.cleanDataBaseResult.observe(this) {
+            Toast.makeText(
+                this,
+                getString(R.string.text_database_cleaned),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -84,19 +92,25 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_create_backup -> {
-                if(checkStoragePermission()){
+                if (checkStoragePermission()) {
                     mainViewModel.createBackup()
                 }
                 true
             }
             R.id.action_restore_backup -> {
-                if(checkStoragePermission()){
+                if (checkStoragePermission()) {
                     //Do something
                 }
                 true
             }
             R.id.action_clean_data_base -> {
-                //permission not needed
+                MaterialAlertDialogBuilder(this)
+                    .setCancelable(true)
+                    .setMessage("Are you sure tou want to delete the current database?")
+                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                    .setPositiveButton("Yes") { _, _ -> mainViewModel.clearDataBase() }
+                    .create()
+                    .show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
