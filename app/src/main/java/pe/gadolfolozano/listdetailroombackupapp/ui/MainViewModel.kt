@@ -11,6 +11,7 @@ import pe.gadolfolozano.listdetailroombackupapp.domain.ClearDataBaseUseCase
 import pe.gadolfolozano.listdetailroombackupapp.domain.CreateBackupUseCase
 import pe.gadolfolozano.listdetailroombackupapp.domain.RestoreBackupUseCase
 import pe.gadolfolozano.listdetailroombackupapp.ui.model.UserModel
+import pe.gadolfolozano.listdetailroombackupapp.ui.util.SingleLiveEvent
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.UUIDGenerator
 import java.io.File
 
@@ -23,6 +24,8 @@ class MainViewModel(
 ) : ViewModel() {
 
     val userLiveData = MediatorLiveData<UserModel>()
+
+    val createBackupFileResult = SingleLiveEvent<File>()
 
     fun fetchUser() {
         userLiveData.addSource(userDAO.fetchUser()) { userEntityList ->
@@ -47,6 +50,7 @@ class MainViewModel(
     fun createBackup() {
         viewModelScope.launch(Dispatchers.IO) {
             val backupFile = createBackupUseCase.execute()
+            createBackupFileResult.postValue(backupFile)
         }
     }
 

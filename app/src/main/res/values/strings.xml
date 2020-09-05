@@ -14,4 +14,6 @@
     <string name="action_create_backup">Create Backup</string>
     <string name="action_restore_backup">Restore Backup</string>
     <string name="action_clean_data_base">Clean database</string>
+
+    <string name="text_backup_created">Backup created at %s</string>
 </resources>

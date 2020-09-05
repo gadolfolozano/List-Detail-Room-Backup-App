@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
@@ -65,6 +66,13 @@ class MainActivity : AppCompatActivity(),
         mainViewModel.fetchUser()
         mainViewModel.userLiveData.observe(this) { userModel ->
             userNameTextView.text = userModel.userName
+        }
+        mainViewModel.createBackupFileResult.observe(this) { backupFile ->
+            Toast.makeText(
+                this,
+                getString(R.string.text_backup_created, backupFile.absolutePath),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 

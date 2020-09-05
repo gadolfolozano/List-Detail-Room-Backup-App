@@ -7,6 +7,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import pe.gadolfolozano.listdetailroombackupapp.data.BackupTaskDatabase
 import pe.gadolfolozano.listdetailroombackupapp.data.TaskDatabase
 import pe.gadolfolozano.listdetailroombackupapp.domain.BackupUtil
 import pe.gadolfolozano.listdetailroombackupapp.domain.ClearDataBaseUseCase
@@ -19,7 +20,7 @@ import pe.gadolfolozano.listdetailroombackupapp.ui.util.UUIDGenerator
 
 object Koin {
     @JvmField
-    val MODULES: List<Module> = listOf(taskModule, databaseModule, utilModule)
+    val MODULES: List<Module> = listOf(taskModule, databaseModule, backupDatabaseModule, utilModule)
 
     @JvmStatic
     fun initialize(application: Application) {
@@ -31,7 +32,7 @@ object Koin {
 }
 
 val taskModule = module {
-    factory { BackupUtil() }
+    factory { BackupUtil(androidContext(), get(), get(), get(), get()) }
     factory { CreateBackupUseCase(get()) }
     factory { RestoreBackupUseCase(get()) }
     factory { ClearDataBaseUseCase(get()) }
@@ -55,6 +56,19 @@ val databaseModule = module {
     single { get<TaskDatabase>().taskDAO() }
 
     single { get<TaskDatabase>().taskDetailDAO() }
+}
+
+val backupDatabaseModule = module {
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            BackupTaskDatabase::class.java,
+            BackupTaskDatabase.NAME
+        ).fallbackToDestructiveMigration().build()
+    }
+    single { get<BackupTaskDatabase>().backupTaskDAO() }
+
+    single { get<BackupTaskDatabase>().backupTaskDetailDAO() }
 }
 
 val utilModule = module {
