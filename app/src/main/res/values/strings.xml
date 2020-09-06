@@ -18,4 +18,9 @@
 
     <string name="text_backup_created">Backup created at %s</string>
     <string name="text_database_cleaned">Database cleaned</string>
+
+    <string name="text_restore_backup_title">Restore backup from %s</string>
+    <string name="text_restore_select">Select</string>
+    <string name="text_restore_cancel">Cancel</string>
+    <string name="text_restore_success">Backup restored successfully</string>
 </resources>

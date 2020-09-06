@@ -1,5 +1,6 @@
 package pe.gadolfolozano.listdetailroombackupapp.ui
 
+import android.os.Environment
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,6 +30,10 @@ class MainViewModel(
 
     val cleanDataBaseResult = SingleLiveEvent<Boolean>()
 
+    val shouldShowFilePicker = SingleLiveEvent<Pair<File, List<String>>>()
+
+    val shouldShowRestoreBackupSuccess = SingleLiveEvent<Boolean>()
+
     fun fetchUser() {
         userLiveData.addSource(userDAO.fetchUser()) { userEntityList ->
             userLiveData.postValue(userEntityList?.map { UserModel(it.username) }?.firstOrNull())
@@ -54,9 +59,10 @@ class MainViewModel(
         }
     }
 
-    fun restoreBackup(backupFile: File) {
+    fun restoreBackup(folder: File, fileName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            restoreBackupUseCase.execute(backupFile)
+            restoreBackupUseCase.execute(File(folder, fileName))
+            shouldShowRestoreBackupSuccess.postValue(true)
         }
     }
 
@@ -65,5 +71,18 @@ class MainViewModel(
             clearDataBaseUseCase.execute()
             cleanDataBaseResult.postValue(true)
         }
+    }
+
+    fun fetchBackupFiles(){
+        val folder = getDownloadsFolder()
+        val downloadFiles = folder.listFiles()?.map { it.name }
+            ?.filter { it.endsWith(".zip") }
+        downloadFiles?.let { files ->
+            shouldShowFilePicker.postValue(Pair(folder, files))
+        }
+    }
+
+    private fun getDownloadsFolder(): File {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     }
 }

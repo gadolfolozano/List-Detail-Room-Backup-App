@@ -46,9 +46,8 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
         private val itemClickListener: ItemClickListener<TaskModel>?
     ) : RecyclerView.ViewHolder(view) {
 
-        val cardView = view.findViewById<CardView>(R.id.card_view)
-        val taskNameTextView = view.findViewById<TextView>(R.id.task_name_text_view)
-        val taskDateTextView = view.findViewById<TextView>(R.id.task_date_text_view)
+        private val cardView = view.findViewById<CardView>(R.id.card_view)
+        private val taskNameTextView = view.findViewById<TextView>(R.id.task_name_text_view)
 
         fun onBind(model: TaskModel) {
             cardView.setOnClickListener {

@@ -24,6 +24,7 @@ import pe.gadolfolozano.listdetailroombackupapp.R
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskList.TaskListFragment
 import pe.gadolfolozano.listdetailroombackupapp.ui.taskdetail.TaskDetailFragment
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.InputTextBottomSheetFragment
+import java.io.File
 
 class MainActivity : AppCompatActivity(),
     InputTextBottomSheetFragment.InputTextListener {
@@ -82,6 +83,31 @@ class MainActivity : AppCompatActivity(),
                 Toast.LENGTH_LONG
             ).show()
         }
+        mainViewModel.shouldShowFilePicker.observe(this) { (folder, files) ->
+            showFilePicker(folder, files)
+        }
+        mainViewModel.shouldShowRestoreBackupSuccess.observe(this) {
+            Toast.makeText(
+                this,
+                getString(R.string.text_restore_success),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun showFilePicker(folder: File, files: List<String>) {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.text_restore_backup_title, folder.absolutePath))
+        var checkedItem = 0
+        builder.setSingleChoiceItems(files.toTypedArray(), checkedItem) { _, which ->
+            checkedItem = which
+        }
+        builder.setPositiveButton(R.string.text_restore_select) { _, _ ->
+            mainViewModel.restoreBackup(folder, files[checkedItem])
+        }
+        builder.setNegativeButton(R.string.text_restore_cancel, null)
+        val dialog = builder.create()
+        dialog.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -99,7 +125,7 @@ class MainActivity : AppCompatActivity(),
             }
             R.id.action_restore_backup -> {
                 if (checkStoragePermission()) {
-                    //Do something
+                    mainViewModel.fetchBackupFiles()
                 }
                 true
             }

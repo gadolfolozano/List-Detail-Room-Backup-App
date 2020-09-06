@@ -5,6 +5,8 @@ import android.os.Environment
 import pe.gadolfolozano.listdetailroombackupapp.data.BackupTaskDatabase
 import pe.gadolfolozano.listdetailroombackupapp.data.dao.*
 import pe.gadolfolozano.listdetailroombackupapp.data.entity.mapToBackup
+import pe.gadolfolozano.listdetailroombackupapp.data.entity.mapToEntity
+import pe.gadolfolozano.listdetailroombackupapp.ui.util.unzip
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.zip
 import java.io.File
 import java.text.SimpleDateFormat
@@ -27,11 +29,17 @@ class BackupUtil(
     }
 
     suspend fun restoreBackup(backupFile: File) {
-
+        cleanBackupDataBase()
+        copyRestoredFiles(backupFile)
+        cleanDataBase(false)
+        fillDataBase()
+        cleanBackupDataBase()
     }
 
-    suspend fun cleanDataBase() {
-        taskDetailDAO.deleteAll()
+    suspend fun cleanDataBase(shouldCleanUserTable: Boolean = true) {
+        if (shouldCleanUserTable) {
+            taskDetailDAO.deleteAll()
+        }
         taskDAO.deleteAll()
         userDAO.deleteAll()
     }
@@ -70,13 +78,65 @@ class BackupUtil(
         return zippedFile
     }
 
+    private fun copyBackupDataBase() {
+        context.getDatabasePath(BackupTaskDatabase.NAME)
+            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_NAME), overwrite = true)
+        context.getDatabasePath(BackupTaskDatabase.NAME + "-shm")
+            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME), overwrite = true)
+        context.getDatabasePath(BackupTaskDatabase.NAME + "-wal")
+            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME), overwrite = true)
+    }
+
+    private fun copyRestoredFiles(backupFile: File) {
+        getBackupFolder().deleteRecursively()
+        require(backupFile.exists()) { "backup file at ${backupFile.absolutePath} does not exists" }
+
+        backupFile.unzip(getBackupFolder().parentFile)
+
+        require(validateBackupFolderStructure()) { "Invalid backup structure" }
+
+        File(getBackupFolder(), BACKUP_DATA_BASE_NAME).copyTo(
+            target = context.getDatabasePath(BackupTaskDatabase.NAME), overwrite = true
+        )
+        File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME).copyTo(
+            target = context.getDatabasePath(BackupTaskDatabase.NAME + "-shm"), overwrite = true
+        )
+        File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME).copyTo(
+            target = context.getDatabasePath(BackupTaskDatabase.NAME + "-wal"), overwrite = true
+        )
+
+        getBackupFolder().deleteRecursively()
+    }
+
+    private suspend fun fillDataBase() {
+        val allBackupTasks = backupTaskDAO.listAll()
+        allBackupTasks.forEach { taskDAO.save(it.mapToEntity()) }
+
+        val allBackupTaskDetails = backupTaskDetailDAO.listAll()
+        allBackupTaskDetails.forEach { taskDetailDAO.save(it.mapToEntity()) }
+    }
+
+    private fun validateBackupFolderStructure(): Boolean {
+        val backupFolder = getBackupFolder()
+        if (backupFolder.exists() && backupFolder.isDirectory) {
+            val backupDatabaseFile = File(getBackupFolder(), BACKUP_DATA_BASE_NAME)
+            val backupDatabaseSHMFile = File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME)
+            val backupDatabaseWALFile = File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME)
+
+            return backupDatabaseFile.exists() && backupDatabaseFile.isFile &&
+                    backupDatabaseSHMFile.exists() && backupDatabaseSHMFile.isFile &&
+                    backupDatabaseWALFile.exists() && backupDatabaseWALFile.isFile
+        }
+        return false
+    }
+
     private fun getBackupFolder(): File {
         val backupFolder = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
             "Backup"
         )
 
-        if(!backupFolder.exists()){
+        if (!backupFolder.exists()) {
             backupFolder.mkdirs()
         }
         return backupFolder
@@ -84,15 +144,6 @@ class BackupUtil(
 
     private fun getDownloadsFolder(): File {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    }
-
-    private fun copyBackupDataBase() {
-        context.getDatabasePath(BackupTaskDatabase.NAME)
-            .copyTo(File(getBackupFolder(), BACKUP_DATA_BASE_NAME))
-        context.getDatabasePath(BackupTaskDatabase.NAME+ "-shm")
-            .copyTo(File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME))
-        context.getDatabasePath(BackupTaskDatabase.NAME+ "-wal")
-            .copyTo(File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME))
     }
 
     companion object {

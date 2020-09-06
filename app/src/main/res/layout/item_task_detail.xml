@@ -28,7 +28,6 @@
                 android:id="@+id/task_detail_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="task name"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
