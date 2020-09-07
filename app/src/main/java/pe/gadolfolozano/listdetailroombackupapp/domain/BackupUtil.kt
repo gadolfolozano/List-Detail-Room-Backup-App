@@ -9,8 +9,10 @@ import pe.gadolfolozano.listdetailroombackupapp.data.entity.mapToEntity
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.unzip
 import pe.gadolfolozano.listdetailroombackupapp.ui.util.zip
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class BackupUtil(
     private val context: Context,
@@ -79,12 +81,18 @@ class BackupUtil(
     }
 
     private fun copyBackupDataBase() {
-        context.getDatabasePath(BackupTaskDatabase.NAME)
-            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_NAME), overwrite = true)
-        context.getDatabasePath(BackupTaskDatabase.NAME + "-shm")
-            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME), overwrite = true)
-        context.getDatabasePath(BackupTaskDatabase.NAME + "-wal")
-            .copyTo(target = File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME), overwrite = true)
+        copyDataFromOneToAnother(
+            context.getDatabasePath(BackupTaskDatabase.NAME).absolutePath,
+            File(getBackupFolder(), BACKUP_DATA_BASE_NAME).absolutePath
+        )
+        copyDataFromOneToAnother(
+            context.getDatabasePath(BackupTaskDatabase.NAME + "-shm").absolutePath,
+            File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME).absolutePath
+        )
+        copyDataFromOneToAnother(
+            context.getDatabasePath(BackupTaskDatabase.NAME + "-wal").absolutePath,
+            File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME).absolutePath
+        )
     }
 
     private fun copyRestoredFiles(backupFile: File) {
@@ -95,17 +103,31 @@ class BackupUtil(
 
         require(validateBackupFolderStructure()) { "Invalid backup structure" }
 
-        File(getBackupFolder(), BACKUP_DATA_BASE_NAME).copyTo(
-            target = context.getDatabasePath(BackupTaskDatabase.NAME), overwrite = true
+        copyDataFromOneToAnother(
+            File(getBackupFolder(), BACKUP_DATA_BASE_NAME).absolutePath,
+            context.getDatabasePath(BackupTaskDatabase.NAME).absolutePath
         )
-        File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME).copyTo(
-            target = context.getDatabasePath(BackupTaskDatabase.NAME + "-shm"), overwrite = true
+        copyDataFromOneToAnother(
+            File(getBackupFolder(), BACKUP_DATA_BASE_SHM_NAME).absolutePath,
+            context.getDatabasePath(BackupTaskDatabase.NAME + "-shm").absolutePath
         )
-        File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME).copyTo(
-            target = context.getDatabasePath(BackupTaskDatabase.NAME + "-wal"), overwrite = true
+        copyDataFromOneToAnother(
+            File(getBackupFolder(), BACKUP_DATA_BASE_WAL_NAME).absolutePath,
+            context.getDatabasePath(BackupTaskDatabase.NAME + "-wal").absolutePath
         )
 
         getBackupFolder().deleteRecursively()
+    }
+
+    private fun copyDataFromOneToAnother(fromPath: String, toPath: String) {
+        val inStream = File(fromPath).inputStream()
+        val outStream = FileOutputStream(toPath)
+
+        inStream.use { input ->
+            outStream.use { output ->
+                input.copyTo(output)
+            }
+        }
     }
 
     private suspend fun fillDataBase() {
@@ -148,9 +170,9 @@ class BackupUtil(
 
     companion object {
         private const val BACKUP_DATE_FORMAT = "MMM dd, YYYY hh:mm a"
-        private const val BACKUP_FILE_NAME_FORMAT = "Backup %s.zip"
-        private const val BACKUP_DATA_BASE_NAME = "backup_data"
-        private const val BACKUP_DATA_BASE_SHM_NAME = "backup_data-shm"
-        private const val BACKUP_DATA_BASE_WAL_NAME = "backup_data-wal"
+        private const val BACKUP_FILE_NAME_FORMAT = "Backup File %s.zip"
+        private const val BACKUP_DATA_BASE_NAME = "backup_data.db"
+        private const val BACKUP_DATA_BASE_SHM_NAME = "backup_data.db-shm"
+        private const val BACKUP_DATA_BASE_WAL_NAME = "backup_data.db-wal"
     }
 }
